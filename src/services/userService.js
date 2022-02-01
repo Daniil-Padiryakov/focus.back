@@ -1,10 +1,11 @@
 import User from "../models/user.js";
 import bcrypt from "bcryptjs";
-import {v4 as uuid} from 'uuid';
-import tokenService from "./tokenService.js";
-import mailService from "./mailService.js";
-import UserDto from "../dtos/user-dto.js";
 import ApiError from "../exceptions/api-error.js";
+import jwt from "jsonwebtoken";
+
+const generateAccessToken = (id) => {
+    return jwt.sign({id}, process.env.JWT_ACCESS_SECRET, {expiresIn: "24h"} )
+}
 
 class UserService {
     async registration(email, password) {
@@ -12,25 +13,11 @@ class UserService {
         if (candidate) {
             throw ApiError.BadRequest(`Пользователь с почтовым адресом ${email} уже существует`)
         }
+
         const hashPassword = await bcrypt.hash(password, 7)
-        const activationLink = uuid()
-        const user = await User.create({email, password: hashPassword, activationLink})
-        await mailService.sendActivationMail(email, `${process.env.API_URL}/api/user/activate/${activationLink}`)
 
-        const userDto = new UserDto(user)
-        const tokens = tokenService.generateTokens({...userDto})
-        await tokenService.saveToken(userDto.id, tokens.refreshToken)
-
-        return {...tokens, user: userDto}
-    }
-
-    async activate(activationLink) {
-        const user = await User.findOne({activationLink})
-        if (!user) {
-            throw ApiError.BadRequest('Неккоректная ссылка активации')
-        }
-        user.isActivated = true;
-        await user.save();
+        const user = await User.create({email, password: hashPassword})
+        return user
     }
 
     async login(email, password) {
@@ -42,11 +29,9 @@ class UserService {
         if (!isPassEquals) {
             throw ApiError.BadRequest('Неверный пароль');
         }
-        const userDto = new UserDto(user);
-        const tokens = tokenService.generateTokens({...userDto});
 
-        await tokenService.saveToken(userDto.id, tokens.refreshToken);
-        return {...tokens, user: userDto}
+        const token = generateAccessToken(user._id)
+        return {token, user: user._id}
     }
 
     async logout(refreshToken) {

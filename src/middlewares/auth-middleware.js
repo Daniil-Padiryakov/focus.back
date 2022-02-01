@@ -1,26 +1,20 @@
-import ApiError from "../exceptions/api-error.js";
-import tokenService from "../services/tokenService.js";
+import jwt from "jsonwebtoken";
 
 export default function (req, res, next) {
+    if (req.method === "OPTIONS") {
+        next()
+    }
+
     try {
-        const authorizationHeader = req.headers.authorization;
-        if (!authorizationHeader) {
-            return next(ApiError.UnauthorizedError());
+        const token = req.headers.authorization.split(' ')[1]
+        if (!token) {
+            return res.status(403).json({message: "Пользователь не авторизован"})
         }
-
-        const accessToken = authorizationHeader.split(' ')[1];
-        if (!accessToken) {
-            return next(ApiError.UnauthorizedError());
-        }
-
-        const userData = tokenService.validateAccessToken(accessToken);
-        if (!userData) {
-            return next(ApiError.UnauthorizedError());
-        }
-
-        req.user = userData;
-        next();
+        const decodedData = jwt.verify(token, process.env.JWT_ACCESS_SECRET)
+        req.user = decodedData
+        next()
     } catch (e) {
-        return next(ApiError.UnauthorizedError());
+        console.log(e)
+        return res.status(403).json({message: "Пользователь не авторизован"})
     }
 };

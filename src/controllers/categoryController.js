@@ -12,6 +12,7 @@ class CategoryController {
 
     async getAll(req, res) {
         try {
+            console.log(req.user.id)
             const categories = await CategoryService.getAll(req.user.id)
             return res.json(categories)
         } catch (e) {
