@@ -1,4 +1,4 @@
-import PomodoroService from "../services/pomodoroService.js";
+const PomodoroService = require('../services/pomodoroService.js')
 
 class PomodoroController {
     async create(req, res) {
@@ -20,4 +20,4 @@ class PomodoroController {
     }
 }
 
-export default new PomodoroController()
+module.exports = new PomodoroController()

@@ -1,6 +1,6 @@
-import Router from 'express'
-import {body} from 'express-validator'
-import userController from "../controllers/userController.js";
+const Router = require('express')
+const {body} = require('express-validator')
+const userController = require('../controllers/userController.js')
 const router = new Router()
 
 router.post('/registration',
@@ -11,6 +11,6 @@ router.post('/registration',
 
 router.post('/login', userController.login)
 
-router.post('/logout', userController.logout)
+// router.post('/logout', userController.logout)
 
-export default router
+module.exports = router
