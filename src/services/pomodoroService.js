@@ -1,15 +1,18 @@
-import Pomodoro from "../models/pomodoro.js";
+const Pomodoro = require('../models/pomodoro.js')
 
 class pomodoroService {
     async create(pomodoro) {
-        const createdPomodoro = await Pomodoro.create(pomodoro)
+        console.log(pomodoro)
+        const {duration, categoryId, userId} = pomodoro
+        const createdPomodoro = await Pomodoro.create({duration, categoryId, userId})
+        console.log(createdPomodoro)
         return createdPomodoro
     }
 
     async getAll() {
-        const pomodoros = await Pomodoro.find()
+        const pomodoros = await Pomodoro.findAll()
         return pomodoros
     }
 }
 
-export default new pomodoroService()
+module.exports = new pomodoroService()

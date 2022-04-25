@@ -1,8 +1,9 @@
-import Category from "../models/category.js";
+const Category = require('../models/category.js')
 
 class CategoryService {
     async create(category) {
-        const createdCategory = await Category.create(category)
+        const {title, userId} = category
+        const createdCategory = await Category.create({title, userId})
         return createdCategory
     }
 
@@ -10,21 +11,28 @@ class CategoryService {
         if (!id) {
             throw new Error('Не был указан ID пользователя')
         }
-        const categories = await Category.find({
-            user: id
+        const categories = await Category.findAll({
+            where: {
+                userId: id
+            }
         })
         return categories
     }
 
     async update(category) {
-        if (!category._id) {
+        if (!category.id) {
             throw new Error('Не был указан ID категории')
         }
-        const updatedCategory = await Category.findByIdAndUpdate(
-            category._id,
-            category,
-            {new: true}
-        )
+        const updatedCategory = await Category.update(
+            {
+                title: category.title
+            },
+            {
+                where: {
+                    id: category.id
+                },
+                returning: true
+            })
         return updatedCategory
     }
 
@@ -32,9 +40,13 @@ class CategoryService {
         if (!id) {
             throw new Error('Не был указан ID категории')
         }
-        const category = await Category.findByIdAndDelete(id)
+        const category = await Category.destroy({
+            where: {
+                id: id
+            },
+        })
         return category
     }
 }
 
-export default new CategoryService()
+module.exports = new CategoryService()
