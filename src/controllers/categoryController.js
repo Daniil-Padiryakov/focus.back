@@ -1,4 +1,4 @@
-import CategoryService from "../services/categoryService.js";
+const CategoryService = require('../services/categoryService.js')
 
 class CategoryController {
     async create(req, res) {
@@ -12,7 +12,7 @@ class CategoryController {
 
     async getAll(req, res) {
         try {
-            console.log(req.user.id)
+            console.log(req.user)
             const categories = await CategoryService.getAll(req.user.id)
             return res.json(categories)
         } catch (e) {
@@ -39,4 +39,4 @@ class CategoryController {
     }
 }
 
-export default new CategoryController()
+module.exports = new CategoryController()

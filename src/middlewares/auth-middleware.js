@@ -1,6 +1,6 @@
-import jwt from "jsonwebtoken";
+const jwt = require('jsonwebtoken')
 
-export default function (req, res, next) {
+module.exports = function (req, res, next) {
     if (req.method === "OPTIONS") {
         next()
     }
@@ -10,7 +10,7 @@ export default function (req, res, next) {
         if (!token) {
             return res.status(403).json({message: "Пользователь не авторизован"})
         }
-        const decodedData = jwt.verify(token, process.env.JWT_ACCESS_SECRET)
+        const decodedData = jwt.verify(token, process.env.SECRET_KEY)
         req.user = decodedData
         next()
     } catch (e) {
