@@ -1,9 +1,5 @@
 require('dotenv').config()
 const express = require('express')
-const sequelize = require('./db')
-const user = require('./src/models/user')
-const category = require('./src/models/category')
-const pomodoro = require('./src/models/pomodoro')
 const router = require('./src/router/index.js')
 const cookieParser = require('cookie-parser')
 const cors = require('cors')
@@ -25,16 +21,16 @@ app.get('/', (req, res) => {
     res.send().json({sadas: "asfafas"})
 })
 
-async function startApp() {
-    try {
-        await sequelize.authenticate()
-        await sequelize.sync()
-        app.listen(PORT, () => console.log(PORT))
-    } catch (e) {
-        console.log(e)
-    }
+// async function startApp() {
+//     try {
+//         return app.listen(PORT, () => console.log(PORT))
+//     } catch (e) {
+//         console.log(e)
+//     }
+// }
+
+if (process.env.NODE_ENV !== 'test') {
+     app.listen(PORT)
 }
 
-startApp()
-
-
+module.exports = app

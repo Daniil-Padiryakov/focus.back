@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "test": "jest --watchAll"
+    "test": "jest --watchAll --forceExit"
   },
   "keywords": [],
   "author": "",
@@ -20,19 +20,15 @@
     "express": "^4.17.2",
     "express-validator": "^6.14.0",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^6.1.5",
     "nodemailer": "^6.7.2",
     "passport": "^0.5.2",
     "passport-jwt": "^4.0.0",
     "pg": "^8.7.3",
-    "pg-hstore": "^2.3.4",
-    "sequelize": "^6.19.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
     "jest": "^28.0.0",
     "nodemon": "^2.0.15",
-    "sequelize-cli": "^6.4.1",
     "supertest": "^6.2.2"
   },
   "engines": {
