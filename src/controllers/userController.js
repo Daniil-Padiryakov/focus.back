@@ -1,6 +1,6 @@
-import { validationResult } from "express-validator";
-import userService from "../services/userService.js";
-import ApiError from "../exceptions/api-error.js";
+const { validationResult } = require('express-validator')
+const userService = require('../services/userService.js')
+const ApiError = require('../exceptions/api-error.js')
 
 class userController {
     async registration(req, res, next) {
@@ -28,32 +28,32 @@ class userController {
         }
     }
 
-    async logout(req, res, next) {
-        try {
-            const {refreshToken} = req.cookies;
-            const token = await userService.logout(refreshToken);
-            res.clearCookie('refreshToken');
-            return res.json(token);
-        } catch (e) {
-            next(e);
-        }
-    }
-
-    async refresh(req, res, next) {
-        try {
-            console.log(req)
-            const {refreshToken} = req.cookies;
-            const userData = await userService.refresh(refreshToken);
-            res.cookie('refreshToken', userData.refreshToken, {
-                sameSite: 'none',
-                maxAge: 30 * 24 * 60 * 60 * 1000,
-                secure: true,
-                httpOnly: true})
-            return res.json(userData);
-        } catch (e) {
-            next(e);
-        }
-    }
+    // async logout(req, res, next) {
+    //     try {
+    //         const {refreshToken} = req.cookies;
+    //         const token = await userService.logout(refreshToken);
+    //         res.clearCookie('refreshToken');
+    //         return res.json(token);
+    //     } catch (e) {
+    //         next(e);
+    //     }
+    // }
+    //
+    // async refresh(req, res, next) {
+    //     try {
+    //         console.log(req)
+    //         const {refreshToken} = req.cookies;
+    //         const userData = await userService.refresh(refreshToken);
+    //         res.cookie('refreshToken', userData.refreshToken, {
+    //             sameSite: 'none',
+    //             maxAge: 30 * 24 * 60 * 60 * 1000,
+    //             secure: true,
+    //             httpOnly: true})
+    //         return res.json(userData);
+    //     } catch (e) {
+    //         next(e);
+    //     }
+    // }
 }
 
-export default new userController()
+module.exports = new userController()

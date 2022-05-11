@@ -1,10 +1,9 @@
-import mongoose from "mongoose";
-
-const Pomodoro = new mongoose.Schema({
-    duration: {type: Number, required: true},
-    dateCreated: {type: Date, default: Date.now},
-    user: {ref: 'users', type: mongoose.Schema.Types.ObjectId},
-    category: {ref: 'categories', type: mongoose.Schema.Types.ObjectId},
-})
-
-export default mongoose.model('Pomodoro', Pomodoro)
+// const sequelize = require('../../db')
+// const {DataTypes} = require('sequelize')
+//
+// const Pomodoro = sequelize.define('pomodoro', {
+//     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+//     duration: {type: DataTypes.INTEGER, allowNull: false},
+// })
+//
+// module.exports = Pomodoro

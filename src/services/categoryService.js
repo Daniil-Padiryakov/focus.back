@@ -1,30 +1,59 @@
-import Category from "../models/category.js";
+const Category = require('../models/category.js')
+const pool = require("../db/db");
+const queries = require("../db/queries/category");
 
 class CategoryService {
-    async create(category) {
-        const createdCategory = await Category.create(category)
+    async create(title, user_id) {
+        const createdCategory = await pool.query(queries.addCategory, [title, user_id])
+            .then(async res => {
+                const categoryRes = await pool.query(queries.getLastCategory, [user_id]).catch(err =>
+                    setImmediate(() => {
+                        throw err
+                    })
+                )
+                return categoryRes.rows[0]
+            })
+            .catch(err =>
+                setImmediate(() => {
+                throw err
+            }))
         return createdCategory
     }
 
-    async getAll(id) {
-        if (!id) {
+    async getAll(user_id) {
+        if (!user_id) {
             throw new Error('Не был указан ID пользователя')
         }
-        const categories = await Category.find({
-            user: id
-        })
-        return categories
+        const allCategories = await pool
+            .query(queries.getAllCategoriesByUserId, [user_id])
+            .catch(err =>
+                setImmediate(() => {
+                    throw err
+                })
+            )
+        return allCategories.rows
     }
 
     async update(category) {
-        if (!category._id) {
+        if (!category.id) {
             throw new Error('Не был указан ID категории')
         }
-        const updatedCategory = await Category.findByIdAndUpdate(
-            category._id,
-            category,
-            {new: true}
-        )
+        const updatedCategory = await pool
+            .query(queries.updateCategory, [category.title, category.id]).then(
+                (async res => {
+                    const categoryRes = await pool.query(queries.getCategoryById, [category.id]).catch(err =>
+                        setImmediate(() => {
+                            throw err
+                        })
+                    )
+                    return categoryRes.rows[0]
+                })
+            )
+            .catch(err =>
+                setImmediate(() => {
+                    throw err
+                })
+            )
         return updatedCategory
     }
 
@@ -32,9 +61,15 @@ class CategoryService {
         if (!id) {
             throw new Error('Не был указан ID категории')
         }
-        const category = await Category.findByIdAndDelete(id)
-        return category
+        const deleteCategoryRes = await pool
+            .query(queries.deleteCategoryById, [id])
+            .catch(err =>
+                setImmediate(() => {
+                    throw err
+                })
+            )
+        return {rowCount: deleteCategoryRes.rowCount}
     }
 }
 
-export default new CategoryService()
+module.exports = new CategoryService()

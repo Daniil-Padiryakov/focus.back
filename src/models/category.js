@@ -1,8 +1,13 @@
-import mongoose from "mongoose";
-
-const Category = new mongoose.Schema({
-    title: {type: String, required: true},
-    user: {ref: 'users', type: mongoose.Schema.Types.ObjectId},
-})
-
-export default mongoose.model('Category', Category)
+// const sequelize = require('../../db')
+// const {DataTypes} = require('sequelize')
+// const Pomodoro = require("./pomodoro");
+//
+// const Category = sequelize.define('category', {
+//     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+//     title: {type: DataTypes.STRING, unique: true, allowNull: false},
+// })
+//
+// Category.hasMany(Pomodoro)
+// Pomodoro.belongsTo(Category)
+//
+// module.exports = Category

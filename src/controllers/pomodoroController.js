@@ -1,4 +1,4 @@
-import PomodoroService from "../services/pomodoroService.js";
+const PomodoroService = require('../services/pomodoroService.js')
 
 class PomodoroController {
     async create(req, res) {
@@ -12,7 +12,7 @@ class PomodoroController {
 
     async getAll(req, res) {
         try {
-            const pomodoros = await PomodoroService.getAll()
+            const pomodoros = await PomodoroService.getAll(req.user.id)
             return res.json(pomodoros)
         } catch (e) {
             res.status(500).json(e)
@@ -20,4 +20,4 @@ class PomodoroController {
     }
 }
 
-export default new PomodoroController()
+module.exports = new PomodoroController()

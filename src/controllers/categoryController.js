@@ -1,9 +1,10 @@
-import CategoryService from "../services/categoryService.js";
+const CategoryService = require('../services/categoryService.js')
 
 class CategoryController {
     async create(req, res) {
         try {
-            const category = await CategoryService.create(req.body)
+            const {title, user_id} = req.body
+            const category = await CategoryService.create(title, user_id)
             res.json(category)
         } catch (e) {
             res.status(500).json(e)
@@ -12,7 +13,6 @@ class CategoryController {
 
     async getAll(req, res) {
         try {
-            console.log(req.user.id)
             const categories = await CategoryService.getAll(req.user.id)
             return res.json(categories)
         } catch (e) {
@@ -25,18 +25,18 @@ class CategoryController {
             const category = await CategoryService.update(req.body)
             return res.json(category)
         } catch (e) {
-            res.status(500).json(e.message)
+            res.status(500).json(e)
         }
     }
 
     async delete(req, res) {
         try {
-            const category = await CategoryService.delete(req.params.id)
-            return res.json(category)
+            const deletedCategoryCount = await CategoryService.delete(req.params.id)
+            return res.json(deletedCategoryCount)
         } catch (e) {
             res.status(500).json(e)
         }
     }
 }
 
-export default new CategoryController()
+module.exports = new CategoryController()
