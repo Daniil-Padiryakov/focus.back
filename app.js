@@ -21,16 +21,17 @@ app.get('/', (req, res) => {
     res.send().json({sadas: "asfafas"})
 })
 
-// async function startApp() {
-//     try {
-//         return app.listen(PORT, () => console.log(PORT))
-//     } catch (e) {
-//         console.log(e)
-//     }
-// }
-
-if (process.env.NODE_ENV !== 'test') {
-     app.listen(PORT)
+async function startApp() {
+    try {
+        if (process.env.NODE_ENV === 'test') {
+            return app.listen(6000, () => console.log(PORT))
+        }
+        return app.listen(PORT, () => console.log(PORT))
+    } catch (e) {
+        console.log(e)
+    }
 }
+
+startApp()
 
 module.exports = app

@@ -12,7 +12,7 @@ class PomodoroController {
 
     async getAll(req, res) {
         try {
-            const pomodoros = await PomodoroService.getAll()
+            const pomodoros = await PomodoroService.getAll(req.user.id)
             return res.json(pomodoros)
         } catch (e) {
             res.status(500).json(e)

@@ -4,7 +4,6 @@ const ApiError = require('../exceptions/api-error.js')
 const jwt = require('jsonwebtoken')
 const pool = require("../db/db");
 const queries = require("../db/queries/user.js");
-const {json} = require("express");
 
 const generateAccessToken = (id) => {
     return jwt.sign({id}, process.env.SECRET_KEY, {expiresIn: "24h"})
@@ -12,11 +11,14 @@ const generateAccessToken = (id) => {
 
 class UserService {
     async registration(email, password) {
-        // TODO create check exits user with same email
-        // const candidate = await User.findOne({where: {email}})
-        // if (candidate) {
-        //     throw ApiError.BadRequest(`Пользователь с почтовым адресом ${email} уже существует`)
-        // }
+        const candidate = await pool.query(queries.getUserByEmail, [email]).catch(err =>
+            setImmediate(() => {
+                throw err
+            })
+        )
+        if (candidate.rows[0]) {
+            throw ApiError.BadRequest(`Пользователь с почтовым адресом ${email} уже существует`)
+        }
 
         const hashPassword = await bcrypt.hash(password, 7)
 
@@ -46,14 +48,17 @@ class UserService {
                     throw err
                 })
             })
-
-        // generate token
-        // const token = generateAccessToken(user.id)
-        return JSON.stringify(user)
+        const token = generateAccessToken(user.id, user.email)
+        return {token}
     }
 
     async login(email, password) {
-        const user = await User.findOne({where: {email}})
+        const user = await pool.query(queries.getUserByEmail, [email])
+            .then(res => res.rows[0])
+            .catch(err => setImmediate(() => {
+                throw err
+            }))
+
         if (!user) {
             throw ApiError.BadRequest('Пользователь с таким email не найден')
         }
@@ -62,8 +67,8 @@ class UserService {
             throw ApiError.BadRequest('Неверный пароль');
         }
 
-        const token = generateAccessToken(user.id)
-        return {token, user: user.id}
+        const token = generateAccessToken(user.id, user.email)
+        return {token}
     }
 
     // async logout(refreshToken) {

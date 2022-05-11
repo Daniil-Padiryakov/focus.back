@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "test": "jest --watchAll --forceExit"
+    "test": "NODE_ENV=test jest --config --watchAll --forceExit ./tests/**/*.test.js"
   },
   "keywords": [],
   "author": "",
