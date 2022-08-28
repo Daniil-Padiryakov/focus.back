@@ -1,47 +1,29 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { PG_CONNECTION } from '../constants';
-import { queries } from '../db/queries/category';
+import { Injectable } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { InjectModel } from 'nest-knexjs';
+import { Knex } from 'knex';
 
 @Injectable()
 export class CategoryService {
-  constructor(@Inject(PG_CONNECTION) private conn: any) {}
+  constructor(@InjectModel() private readonly knex: Knex) {}
 
   async create(dto: CreateCategoryDto) {
     const { title, user_id } = dto;
-    const createdCategory: any = await this.conn
-      .query(queries.addCategory, [title, user_id])
-      .then(async (res: any) => {
-        const categoryRes: any = await this.conn
-          .query(queries.getLastCategory, [user_id])
-          .catch((err: Error) =>
-            setImmediate(() => {
-              throw err;
-            }),
-          );
-        return categoryRes.rows[0];
-      })
-      .catch((err: Error) =>
-        setImmediate(() => {
-          throw err;
-        }),
-      );
+    const [createdCategory] = await this.knex('category')
+      .returning('*')
+      .insert({
+        title,
+        user_id,
+      });
     return createdCategory;
   }
 
-  async getAll(user_id: number) {
+  async getAll(user_id) {
     if (!user_id) {
       throw new Error('Не был указан ID пользователя');
     }
-    const allCategories: any = await this.conn
-      .query(queries.getAllCategoriesByUserId, [user_id])
-      .catch((err: Error) =>
-        setImmediate(() => {
-          throw err;
-        }),
-      );
-    return allCategories.rows;
+    return this.knex('category').where('user_id', user_id);
   }
 
   async update(dto: UpdateCategoryDto) {
@@ -49,37 +31,19 @@ export class CategoryService {
     if (!id) {
       throw new Error('Не был указан ID категории');
     }
-    const updatedCategory = await this.conn
-      .query(queries.updateCategory, [title, id])
-      .then(async (res) => {
-        const categoryRes: any = await this.conn
-          .query(queries.getCategoryById, [id])
-          .catch((err: Error) =>
-            setImmediate(() => {
-              throw err;
-            }),
-          );
-        return categoryRes.rows[0];
-      })
-      .catch((err: Error) =>
-        setImmediate(() => {
-          throw err;
-        }),
-      );
-    return updatedCategory;
+    return this.knex('category').returning('*').where('id', id).update({
+      title,
+    });
   }
 
   async delete(id: any) {
     if (!id) {
       throw new Error('Не был указан ID категории');
     }
-    const deleteCategoryRes: any = await this.conn
-      .query(queries.deleteCategoryById, [id])
-      .catch((err: Error) =>
-        setImmediate(() => {
-          throw err;
-        }),
-      );
-    return { rowCount: deleteCategoryRes.rowCount };
+    const idDeletedCategory: any = await this.knex('category')
+      .returning('id')
+      .where('id', id)
+      .del();
+    return idDeletedCategory;
   }
 }

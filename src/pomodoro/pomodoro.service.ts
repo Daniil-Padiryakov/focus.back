@@ -1,44 +1,26 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { PG_CONNECTION } from '../constants';
-import queries from '../db/queries/pomodoro';
+import { Injectable } from '@nestjs/common';
 import { CreatePomodoroDto } from './dto/create-pomodoro.dto';
+import { Knex } from 'knex';
+import { InjectModel } from 'nest-knexjs';
 
 @Injectable()
 export class PomodoroService {
-  constructor(@Inject(PG_CONNECTION) private conn: any) {}
+  constructor(@InjectModel() private readonly knex: Knex) {}
 
   async create(dto: CreatePomodoroDto) {
     const { duration, user_id, category_id } = dto;
 
-    const createdPomodoro: any = await this.conn
-      .query(queries.addPomodoro, [duration, user_id, category_id])
-      .then(async (res) => {
-        const pomodoroRes = await this.conn
-          .query(queries.getLastPomodoro, [user_id])
-          .catch((err: Error) =>
-            setImmediate(() => {
-              console.log('erroooooooooo');
-              throw err;
-            }),
-          );
-        return pomodoroRes.rows[0];
-      })
-      .catch((err) =>
-        setImmediate(() => {
-          throw err;
-        }),
-      );
+    const [createdPomodoro] = await this.knex('pomodoro')
+      .returning('*')
+      .insert({
+        duration,
+        user_id,
+        category_id,
+      });
     return createdPomodoro;
   }
 
   async getAll(userId: number) {
-    const pomodoros = await this.conn
-      .query(queries.getAllPomodorosByUserId, [userId])
-      .catch((err: Error) =>
-        setImmediate(() => {
-          throw err;
-        }),
-      );
-    return pomodoros.rows;
+    return this.knex('pomodoro').where('user_id', userId);
   }
 }

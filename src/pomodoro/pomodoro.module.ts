@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
 import { PomodoroController } from './pomodoro.controller';
 import { PomodoroService } from './pomodoro.service';
-import { DbModule } from '../db/db.module';
-import { UserModule } from '../user/user.module';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [DbModule, UserModule],
+  imports: [AuthModule],
   controllers: [PomodoroController],
   providers: [PomodoroService],
 })

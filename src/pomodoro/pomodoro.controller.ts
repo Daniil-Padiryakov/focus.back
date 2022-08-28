@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { PomodoroService } from './pomodoro.service';
-import { JwtAuthGuard } from '../user/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreatePomodoroDto } from './dto/create-pomodoro.dto';
 
 @Controller('pomodoro')

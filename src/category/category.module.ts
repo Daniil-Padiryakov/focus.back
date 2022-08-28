@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { CategoryController } from './category.controller';
 import { CategoryService } from './category.service';
-import { DbModule } from '../db/db.module';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [DbModule],
+  imports: [AuthModule],
   controllers: [CategoryController],
   providers: [CategoryService],
 })
